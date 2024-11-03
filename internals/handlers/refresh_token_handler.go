@@ -52,7 +52,6 @@ func RefreshTokenHandler(w http.ResponseWriter, r *http.Request) {
 
 	utils.StoreToken(newToken, user.UserId)
 
-	// Respond with the new token
 	response := map[string]string{"new_token": newToken}
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(response)
