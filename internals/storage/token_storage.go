@@ -25,6 +25,7 @@ func GetTokenByUserId(userId string) (models.Token, bool) {
 	return token, exists
 }
 
+// fetches all tokens
 func GetAllTokens() ([]models.Token, error) {
 	var tokens []models.Token
 	for _, token := range tokenStore {
@@ -37,6 +38,7 @@ func IsTokenExpired(token models.Token) bool {
 	return time.Now().After(token.Expiry)
 }
 
+// Revokes a token
 func RevokeToken(userID, token, reason string) error {
 	mu.Lock()
 	defer mu.Unlock()
@@ -52,21 +54,11 @@ func RevokeToken(userID, token, reason string) error {
 	return nil
 }
 
+// Checks if token is revoked
 func IsTokenRevoked(userID, token string) bool {
 	storedToken, exists := tokenStore[userID]
 	if !exists || storedToken.TokenString != token {
 		return false
 	}
 	return storedToken.IsRevoked
-}
-
-func GetRevokedToken(userID string) (models.Token, bool) {
-	mu.Lock()
-	defer mu.Unlock()
-	for _, token := range tokenStore {
-		if token.UserId == userID && token.IsRevoked {
-			return token, true
-		}
-	}
-	return models.Token{}, false
 }
